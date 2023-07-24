@@ -1,0 +1,33 @@
+/* CSS Reset */
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body,
+html {
+    height: 100vh;
+    overflow: hidden;
+    font-size: 10px;
+}
+
+/* Layout */
+
+.gridContainer {
+    height: 100%;
+
+    display: grid;
+
+    grid-template: repeat(3, 14rem) / repeat(3, 14rem);
+
+    justify-content: center;
+    align-content: center;
+
+}
+
+.tile {
+    width: 14rem;
+    height: 14rem;
+    border: 1px solid black;
+}
