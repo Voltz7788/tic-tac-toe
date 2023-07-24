@@ -185,3 +185,5 @@ const player2 = createPlayer("Andy", "o");
 myGameboard.populateGameboard();
 
 myGameboard.addButtonToTile()
+
+ console.log("pls")
