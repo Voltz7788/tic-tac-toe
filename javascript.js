@@ -40,6 +40,7 @@ const myGameboard = (() => {
                     trackMove(`tile${index}`, index);
                     if (checkWin("x") || checkWin("o") || checkDraw()) {
                         console.log("Game over")
+                        displayController.removeTileButtons();
                         displayController.addPlayAgainButton();
                     }
                     // checkWin("x");
@@ -115,7 +116,6 @@ const myGameboard = (() => {
         for (let index in myGameboard.gameboardArray) {
             displayController.resetTile(`tile${index}`);
             myGameboard.gameboardArray[index].resetTile();
-
         }
     };
 
@@ -145,13 +145,24 @@ const displayController = (() => {
 
         button.addEventListener("click", () => {
             myGameboard.gameReset();
+            myGameboard.addButtonToTile();
             gameContainer.removeChild(button);
         });
 
         gameContainer.appendChild(button);
     };
 
-    return { markAsX, markAsO, resetTile, addPlayAgainButton };
+    const removeTileButtons = function() {
+        for (let index in myGameboard.gameboardArray) {
+            const gridContainer = document.querySelector(".gridContainer");
+            const tile = document.getElementById(`tile${index}`);
+            const newTile = tile.cloneNode(true);
+            gridContainer.replaceChild(newTile, tile);
+        }
+
+    };
+
+    return { markAsX, markAsO, resetTile, addPlayAgainButton, removeTileButtons };
 })();
 
 const createPlayer = (name, marker) => {
