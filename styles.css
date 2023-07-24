@@ -12,6 +12,12 @@ html {
     font-size: 10px;
 }
 
+@font-face {
+    font-family: Inter;
+    src: url(./fonts/Inter-VariableFont_slnt\,wght.ttf);
+}
+
+
 /* Layout */
 
 .gridContainer {
@@ -30,4 +36,8 @@ html {
     width: 14rem;
     height: 14rem;
     border: 1px solid black;
+    font-size: 9rem;
+    text-align: center;
+    font-family: Inter;
 }
+
