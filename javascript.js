@@ -1,3 +1,28 @@
+const createPlayer = (num) => {
+
+    let name = "";
+
+    const setName = function () {
+        name = prompt("Enter your name:")
+        if (!name) {
+            name = `Player ${num}`;
+        };
+    };
+
+    const getName = function () {
+        return name;
+    };
+    return { getName, setName };
+};
+
+const playerSetup = (() => {
+    const player1 = createPlayer(1);
+    const player2 = createPlayer(2);
+
+    return { player1, player2 }
+})();
+
+
 const myGameboard = (() => {
 
     let gameboardArray = []
@@ -42,9 +67,9 @@ const gameLogic = (() => {
 
     const setWinner = function (marker) {
         if (marker === "x") {
-            winner = player1.getName();
+            winner = playerSetup.player1.getName();
         } else if (marker === "o") {
-            winner = player2.getName();
+            winner = playerSetup.player2.getName();
         }
     }
 
@@ -120,14 +145,13 @@ const gameLogic = (() => {
     };
 
     const nameSetup = function () {
-        player1.setName()
-        player2.setName()
+        playerSetup.player1.setName()
+        playerSetup.player2.setName()
         displayController.addPlayerNames()
     };
 
     return { getWinner, resetTurn, checkWin, checkDraw, swapTurn, trackMove, gameReset, nameSetup }
 })();
-
 
 const displayController = (() => {
     const markAsX = function (id) {
@@ -189,8 +213,8 @@ const displayController = (() => {
         const gameContainer = document.querySelector(".gameContainer");
         const player1Label = document.createElement("p");
         const player2Label = document.createElement("p");
-        player1Label.textContent = `${player1.getName()} = X`
-        player2Label.textContent = `${player2.getName()} = O`
+        player1Label.textContent = `${playerSetup.player1.getName()} = X`
+        player2Label.textContent = `${playerSetup.player2.getName()} = O`
         player1Label.setAttribute("id", "player1");
         player2Label.setAttribute("id", "player2");
 
@@ -226,33 +250,16 @@ const displayController = (() => {
     return { markAsX, markAsO, resetTile, showDraw, showWinner, addButtonToTile, addPlayAgainButton, removeTileButtons, addPlayerNames };
 })();
 
-const createPlayer = (num, marker) => {
-
-    let name = "";
-
-    const setName = function () {
-        name = prompt("Enter your name:")
-        if (!name) {
-            name = `Player ${num}`;
-        };
-    };
-
-    const getName = function () {
-        return name;
-    };
-    return { getName, setName };
-};
-
-const player1 = createPlayer(1, "x");
-const player2 = createPlayer(2, "o");
-
-
 const startGame = (() => {
+
     gameLogic.nameSetup();
     myGameboard.populateGameboard();
     displayController.addButtonToTile()
 
 })();
+
+
+
 
 
 
