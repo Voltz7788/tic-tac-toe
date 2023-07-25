@@ -2,6 +2,23 @@ const myGameboard = (() => {
 
     let gameboardArray = []
     let turn = true;
+    let winner = "";
+
+    const setWinner = function(marker) {
+        if (marker === "x") {
+            winner = player1.getName();
+        } else if (marker === "o") {
+            winner = player2.getName();
+        }
+    }
+
+    const getWinner = function() {
+        return winner;
+    }
+
+    const resetTurn = function() {
+        turn = true;
+    }
 
     const createGridTile = function () {
         let tileStatus = "";
@@ -42,10 +59,8 @@ const myGameboard = (() => {
                         console.log("Game over")
                         displayController.removeTileButtons();
                         displayController.addPlayAgainButton();
+                        console.log(turn)
                     }
-                    // checkWin("x");
-                    // checkWin("o");
-                    // checkDraw();
                     swapTurn();
                 }
 
@@ -53,29 +68,28 @@ const myGameboard = (() => {
         };
     };
 
-    
-
-
     const checkWin = function (marker) {
         let resultsArray = [];
         for (let tile of myGameboard.gameboardArray) {
             resultsArray.push(tile.getTileStatus())
         }
 
-        // Check horizontal win
         if ((resultsArray[0] == marker && resultsArray[1] == marker && resultsArray[2] == marker)
             || (resultsArray[3] == marker && resultsArray[4] == marker && resultsArray[5] == marker)
             || (resultsArray[6] == marker && resultsArray[7] == marker && resultsArray[8] == marker)) {
-            console.log("win");
+            setWinner(marker)
+            displayController.showWinner();
             return true;
         } else if ((resultsArray[0] == marker && resultsArray[3] == marker && resultsArray[6] == marker)
             || (resultsArray[1] == marker && resultsArray[4] == marker && resultsArray[7] == marker)
             || (resultsArray[2] == marker && resultsArray[5] == marker && resultsArray[8] == marker)) {
-            console.log("win");
+            setWinner(marker)
+            displayController.showWinner();
             return true;
         } else if ((resultsArray[0] == marker && resultsArray[4] == marker && resultsArray[8] == marker)
             || (resultsArray[2] == marker && resultsArray[4] == marker && resultsArray[6] == marker)) {
-            console.log("win");
+            setWinner(marker)
+            displayController.showWinner();
             return true;
         }
 
@@ -90,7 +104,7 @@ const myGameboard = (() => {
         }
 
         if (counter == 9) {
-            console.log("draw")
+            displayController.showDraw();
             return true;
         }
     };
@@ -119,7 +133,7 @@ const myGameboard = (() => {
         }
     };
 
-    return { populateGameboard, addButtonToTile, gameReset, gameboardArray };
+    return { resetTurn, populateGameboard, addButtonToTile, gameReset, getWinner, gameboardArray };
 })();
 
 const displayController = (() => {
@@ -138,15 +152,31 @@ const displayController = (() => {
         tile.textContent = "";
     };
 
+    const showDraw = function() {
+        const gameContainer = document.querySelector(".gameContainer");
+        const drawMessage = document.createElement("h1")
+        drawMessage.textContent = "It's a draw!";
+        gameContainer.appendChild(drawMessage);
+    };
+
     const addPlayAgainButton = function() {
         const gameContainer = document.querySelector(".gameContainer");
         const button = document.createElement("button");
         button.textContent = "Play again";
+        const message = document.querySelector("h1");
+        const player1Label = document.getElementById("player1");
+        const player2Label = document.getElementById("player2");
 
         button.addEventListener("click", () => {
             myGameboard.gameReset();
             myGameboard.addButtonToTile();
             gameContainer.removeChild(button);
+            gameContainer.removeChild(player1Label);
+            gameContainer.removeChild(player2Label);
+            gameContainer.removeChild(message);
+            
+            myGameboard.resetTurn();
+            nameSetup();
         });
 
         gameContainer.appendChild(button);
@@ -162,28 +192,61 @@ const displayController = (() => {
 
     };
 
-    return { markAsX, markAsO, resetTile, addPlayAgainButton, removeTileButtons };
+    const addPlayerNames = function() {
+        const gameContainer = document.querySelector(".gameContainer");
+        const player1Label = document.createElement("p");
+        const player2Label = document.createElement("p");
+        player1Label.textContent = `${player1.getName()} = X`
+        player2Label.textContent = `${player2.getName()} = O`
+        player1Label.setAttribute("id", "player1");
+        player2Label.setAttribute("id", "player2");
+
+        gameContainer.appendChild(player1Label);
+        gameContainer.appendChild(player2Label);
+    }
+
+    const showWinner = function() {
+        const gameContainer = document.querySelector(".gameContainer");
+        const winMessage = document.createElement("h1");
+        winMessage.textContent = `${myGameboard.getWinner()} has won!`;
+        gameContainer.appendChild(winMessage);
+    }
+
+    return { markAsX, markAsO, resetTile, showDraw, showWinner, addPlayAgainButton, removeTileButtons, addPlayerNames };
 })();
 
-const createPlayer = (name, marker) => {
+const createPlayer = (num, marker) => {
 
-    const getName = () => name;
-    const getMarker = () => marker;
-    return { getName, getMarker };
+    let name = "";
+
+    const setName = function() {
+        name = prompt("Enter your name:")
+        if (!name) {
+            name = `Player ${num}`
+        }
+    }
+
+    const getName = function() {
+        return name
+    };
+    const getMarker = function() {
+        return marker;
+    }
+    return { getName, getMarker, setName };
 };
 
-const player1 = createPlayer("Yannis", "x");
-const player2 = createPlayer("Andy", "o");
+function nameSetup() {
+    player1.setName()
+    player2.setName()
+    displayController.addPlayerNames()
+}
 
+const player1 = createPlayer(1, "x");
+const player2 = createPlayer(2, "o");
 
-
-
-
-
-
-
+nameSetup();
 myGameboard.populateGameboard();
-
 myGameboard.addButtonToTile()
 
- console.log("pls")
+
+

@@ -20,6 +20,15 @@ html {
 
 /* Layout */
 
+
+.gameContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 3rem;
+}
+
 .gridContainer {
     height: 100%;
 
@@ -39,5 +48,9 @@ html {
     font-size: 9rem;
     text-align: center;
     font-family: Inter;
+}
+
+p {
+    font-size: 2rem;
 }
 
