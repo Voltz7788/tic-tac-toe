@@ -22,7 +22,6 @@ const playerSetup = (() => {
     return { player1, player2 }
 })();
 
-
 const myGameboard = (() => {
 
     let gameboardArray = []
@@ -257,12 +256,3 @@ const startGame = (() => {
     displayController.addButtonToTile()
 
 })();
-
-
-
-
-
-
-
-
-
