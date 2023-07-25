@@ -1,24 +1,6 @@
 const myGameboard = (() => {
 
     let gameboardArray = []
-    let turn = true;
-    let winner = "";
-
-    const setWinner = function(marker) {
-        if (marker === "x") {
-            winner = player1.getName();
-        } else if (marker === "o") {
-            winner = player2.getName();
-        }
-    }
-
-    const getWinner = function() {
-        return winner;
-    }
-
-    const resetTurn = function() {
-        turn = true;
-    }
 
     const createGridTile = function () {
         let tileStatus = "";
@@ -33,7 +15,6 @@ const myGameboard = (() => {
 
         const resetTile = function () {
             tileStatus = "";
-            console.log(`Tile reset`)
         }
 
         const getTileStatus = function () {
@@ -49,24 +30,31 @@ const myGameboard = (() => {
         };
     };
 
-    const addButtonToTile = function () {
-        for (let index in myGameboard.gameboardArray) {
-            const tile = document.getElementById(`tile${index}`);
-            tile.addEventListener("click", () => {
-                if (myGameboard.gameboardArray[index].getTileStatus() === "") {
-                    trackMove(`tile${index}`, index);
-                    if (checkWin("x") || checkWin("o") || checkDraw()) {
-                        console.log("Game over")
-                        displayController.removeTileButtons();
-                        displayController.addPlayAgainButton();
-                        console.log(turn)
-                    }
-                    swapTurn();
-                }
 
-            });
-        };
-    };
+
+
+    return { populateGameboard, gameboardArray };
+})();
+
+const gameLogic = (() => {
+    let winner = "";
+    let turn = true;
+
+    const setWinner = function (marker) {
+        if (marker === "x") {
+            winner = player1.getName();
+        } else if (marker === "o") {
+            winner = player2.getName();
+        }
+    }
+
+    const getWinner = function () {
+        return winner;
+    }
+
+    const resetTurn = function () {
+        turn = true;
+    }
 
     const checkWin = function (marker) {
         let resultsArray = [];
@@ -117,12 +105,10 @@ const myGameboard = (() => {
         if (turn) {
             myGameboard.gameboardArray[index].setToX();
             displayController.markAsX(id)
-            console.log(myGameboard.gameboardArray[index].getTileStatus())
 
         } else {
             myGameboard.gameboardArray[index].setToO();
             displayController.markAsO(id);
-            console.log(myGameboard.gameboardArray[index].getTileStatus())
         };
     };
 
@@ -133,8 +119,15 @@ const myGameboard = (() => {
         }
     };
 
-    return { resetTurn, populateGameboard, addButtonToTile, gameReset, getWinner, gameboardArray };
+    const nameSetup = function () {
+        player1.setName()
+        player2.setName()
+        displayController.addPlayerNames()
+    };
+
+    return { getWinner, resetTurn, checkWin, checkDraw, swapTurn, trackMove, gameReset, nameSetup }
 })();
+
 
 const displayController = (() => {
     const markAsX = function (id) {
@@ -142,24 +135,24 @@ const displayController = (() => {
         tile.textContent = "X";
     };
 
-    const markAsO = function(id) {
+    const markAsO = function (id) {
         const tile = document.getElementById(id);
         tile.textContent = "O";
     };
 
-    const resetTile = function(id) {
+    const resetTile = function (id) {
         const tile = document.getElementById(id);
         tile.textContent = "";
     };
 
-    const showDraw = function() {
+    const showDraw = function () {
         const gameContainer = document.querySelector(".gameContainer");
         const drawMessage = document.createElement("h1")
         drawMessage.textContent = "It's a draw!";
         gameContainer.appendChild(drawMessage);
     };
 
-    const addPlayAgainButton = function() {
+    const addPlayAgainButton = function () {
         const gameContainer = document.querySelector(".gameContainer");
         const button = document.createElement("button");
         button.textContent = "Play again";
@@ -168,21 +161,21 @@ const displayController = (() => {
         const player2Label = document.getElementById("player2");
 
         button.addEventListener("click", () => {
-            myGameboard.gameReset();
-            myGameboard.addButtonToTile();
+            gameLogic.gameReset();
+            addButtonToTile();
             gameContainer.removeChild(button);
             gameContainer.removeChild(player1Label);
             gameContainer.removeChild(player2Label);
             gameContainer.removeChild(message);
-            
-            myGameboard.resetTurn();
-            nameSetup();
+
+            gameLogic.resetTurn();
+            gameLogic.nameSetup();
         });
 
         gameContainer.appendChild(button);
     };
 
-    const removeTileButtons = function() {
+    const removeTileButtons = function () {
         for (let index in myGameboard.gameboardArray) {
             const gridContainer = document.querySelector(".gridContainer");
             const tile = document.getElementById(`tile${index}`);
@@ -192,7 +185,7 @@ const displayController = (() => {
 
     };
 
-    const addPlayerNames = function() {
+    const addPlayerNames = function () {
         const gameContainer = document.querySelector(".gameContainer");
         const player1Label = document.createElement("p");
         const player2Label = document.createElement("p");
@@ -205,48 +198,64 @@ const displayController = (() => {
         gameContainer.appendChild(player2Label);
     }
 
-    const showWinner = function() {
+    const showWinner = function () {
         const gameContainer = document.querySelector(".gameContainer");
         const winMessage = document.createElement("h1");
-        winMessage.textContent = `${myGameboard.getWinner()} has won!`;
+        winMessage.textContent = `${gameLogic.getWinner()} has won!`;
         gameContainer.appendChild(winMessage);
     }
 
-    return { markAsX, markAsO, resetTile, showDraw, showWinner, addPlayAgainButton, removeTileButtons, addPlayerNames };
+    const addButtonToTile = function () {
+        for (let index in myGameboard.gameboardArray) {
+            const tile = document.getElementById(`tile${index}`);
+            tile.addEventListener("click", () => {
+                if (myGameboard.gameboardArray[index].getTileStatus() === "") {
+                    gameLogic.trackMove(`tile${index}`, index);
+                    if (gameLogic.checkWin("x") || gameLogic.checkWin("o") || gameLogic.checkDraw()) {
+                        displayController.removeTileButtons();
+                        displayController.addPlayAgainButton();
+                    }
+                    gameLogic.swapTurn();
+                }
+
+            });
+        };
+    };
+
+
+    return { markAsX, markAsO, resetTile, showDraw, showWinner, addButtonToTile, addPlayAgainButton, removeTileButtons, addPlayerNames };
 })();
 
 const createPlayer = (num, marker) => {
 
     let name = "";
 
-    const setName = function() {
+    const setName = function () {
         name = prompt("Enter your name:")
         if (!name) {
-            name = `Player ${num}`
-        }
-    }
-
-    const getName = function() {
-        return name
+            name = `Player ${num}`;
+        };
     };
-    const getMarker = function() {
-        return marker;
-    }
-    return { getName, getMarker, setName };
-};
 
-function nameSetup() {
-    player1.setName()
-    player2.setName()
-    displayController.addPlayerNames()
-}
+    const getName = function () {
+        return name;
+    };
+    return { getName, setName };
+};
 
 const player1 = createPlayer(1, "x");
 const player2 = createPlayer(2, "o");
 
-nameSetup();
-myGameboard.populateGameboard();
-myGameboard.addButtonToTile()
+
+const startGame = (() => {
+    gameLogic.nameSetup();
+    myGameboard.populateGameboard();
+    displayController.addButtonToTile()
+
+})();
+
+
+
 
 
 
